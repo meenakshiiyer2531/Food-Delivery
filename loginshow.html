@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #fff;
+        }
+
+        .container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: #ff4d4d;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            border-radius: 20px;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px 15px;
+            transition: 0.3s;
+            border-radius: 5px;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Login Button */
+        .login-btn {
+            background: white;
+            color: #ff4d4d;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            text-decoration: none;
+            transition: 0.3s;
+            box-shadow: 0 5px 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .login-btn:hover {
+            background: #ff4d4d;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Content */
+        .content {
+            max-width: 600px;
+            margin-top: 80px;
+        }
+
+        .content h1 {
+            font-size: 50px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .content p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Order Now Button */
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: white;
+            color: #ff4d4d;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 50px;
+            transition: 0.3s;
+            box-shadow: 0 5px 10px rgba(255, 255, 255, 0.3);
+        }
+
+        .btn:hover {
+            background-color: #ff4d4d;
+            color: white;
+            box-shadow: 0 5px 15px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Image Styling */
+        .image {
+            width: 220px;
+            margin-top: 20px;
+            animation: bounce 2s infinite;
+        }
+
+        /* Button Animation */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="navbar">
+            <div class="logo"><h2>Food Delivery</h2></div>
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#">Blog</a>
+                <a href="#">Services</a>
+                <a href="#">Location</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1>Fast & Delicious Food</h1>
+            <p>Order your favorite meals from the best restaurants in town and get them delivered fast to your doorstep.</p>
+            <a href="login.html" class="btn">Order Now</a>
+        </div>
+
+        <img class="image" src="https://cdn-icons-png.flaticon.com/512/1995/1995574.png" alt="Delivery Image">
+    </div>
+
+</body>
+</html>
