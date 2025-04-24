@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Restaurant Menu</title>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #28a745;
+      --secondary: #007bff;
+      --bg: #f9f9fb;
+      --text: #2c3e50;
+      --card: #fff;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      padding: 2rem;
+      color: var(--text);
+    }
+    h1 { font-size: 2.5rem; margin-bottom: 1rem; animation: fadeIn 1s ease-in-out; }
+    h2 { margin-top: 2rem; font-size: 1.5rem; border-bottom: 2px solid var(--primary); display: inline-block; padding-bottom: 5px; }
+    #restaurant-image {
+      max-width: 250px;
+      border-radius: 16px;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      animation: fadeIn 1.2s ease-in-out;
+    }
+    .menu-item, #cart div {
+      background-color: var(--card);
+      padding: 15px 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      animation: slideUp 0.4s ease;
+    }
+    .menu-item:hover, #cart div:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+    }
+    button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: var(--primary);
+      color: white;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.3s ease;
+      margin: 0 3px;
+    }
+    button:hover { background-color: #218838; }
+    .action-buttons {
+      margin-top: 30px;
+    }
+    .action-buttons button {
+      margin-right: 15px;
+      background-color: var(--secondary);
+    }
+    .action-buttons button:hover {
+      background-color: #0056b3;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @media (max-width: 768px) {
+      #restaurant-image { width: 100%; height: auto; }
+      h1 { font-size: 2rem; }
+      .menu-item, #cart div {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .menu-item span, #cart div span {
+        margin-top: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="restaurant-name"></h1>
+  <img id="restaurant-image" onerror="this.src='fallback.jpg'" />
+
+  <div>
+    <h2>Menu</h2>
+    <div id="menu-list"></div>
+  </div>
+
+  <div>
+    <h2>Cart</h2>
+    <div id="cart">Cart is empty.</div>
+    <h3 id="total-amount"></h3>
+  </div>
+
+  <div class="action-buttons">
+    <button onclick="buyNow()">Buy Now (Razorpay)</button>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const restaurantName = urlParams.get('name') || "Unknown Restaurant";
+    const restaurantImage = urlParams.get('img') || "default.jpg";
+
+    document.getElementById("restaurant-name").textContent = restaurantName;
+    document.getElementById("restaurant-image").src = restaurantImage;
+
+    const menuItemsMap = {
+      "KFC": [
+        { name: "Zinger Burger", price: 120 },
+        { name: "Popcorn Chicken", price: 150 },
+        { name: "Hot Wings", price: 130 },
+        { name: "Chicken Bucket", price: 350 }
+      ],
+      "Pizza Hut": [
+        { name: "Margherita", price: 200 },
+        { name: "Pepperoni Pizza", price: 280 },
+        { name: "Cheese Burst", price: 250 },
+        { name: "Veggie Supreme", price: 240 }
+      ],
+      "Dominos Pizza": [
+        { name: "Farmhouse", price: 220 },
+        { name: "Peppy Paneer", price: 210 },
+        { name: "Chicken Dominator", price: 270 },
+        { name: "Garlic Bread", price: 120 }
+      ],
+      "Subway": [
+        { name: "Turkey Sub", price: 180 },
+        { name: "Veggie Delight", price: 160 },
+        { name: "Chicken Tikka", price: 190 },
+        { name: "Tuna Sub", price: 200 }
+      ],
+      "Burger King": [
+        { name: "Crispy Chicken Burger", price: 140 },
+        { name: "Veg Makhani Burst Burger", price: 130 },
+        { name: "Crispy Veg Double Patty Burger", price: 150 }
+      ],
+      "Taco Bell": [
+        { name: "Crunchy Taco Supreme", price: 120 },
+        { name: "Cheesy Lava Taco", price: 130 },
+        { name: "Vegstar Wrap", price: 140 },
+        { name: "Chickenstar Wrap", price: 160 }
+      ],
+      "Popeyes": [
+        { name: "Popeyes Signature Fried Chicken", price: 220 },
+        { name: "Cajun Fries", price: 100 },
+        { name: "Cajun Chicken Tenders", price: 190 },
+        { name: "Homestyle Mac and Cheese", price: 160 },
+        { name: "Hot BBQ Chicken Wrap Meal", price: 250 }
+      ],
+      "The Cheesecake Factory": [
+        { name: "Ahi Tuna & Shrimp Ceviche", price: 280 },
+        { name: "Double Smash Cheeseburger", price: 300 },
+        { name: "Mortadella Panino", price: 260 }
+      ],
+      "Chick-fil-A": [
+        { name: "Original Chicken Sandwich", price: 180 },
+        { name: "Chick-fil-A Nuggets", price: 160 },
+        { name: "Waffle Potato Fries", price: 100 },
+        { name: "Cobb Salad", price: 150 }
+      ],
+      "Starbucks": [
+        { name: "Hot Coffee", price: 110 },
+        { name: "Cold Coffee", price: 120 },
+        { name: "Hot Chocolate", price: 130 }
+      ]
+    };
+
+    const menuList = document.getElementById("menu-list");
+    const cartContainer = document.getElementById("cart");
+    const totalAmount = document.getElementById("total-amount");
+    const cart = {};
+
+    const updateCart = () => {
+      cartContainer.innerHTML = "";
+      const entries = Object.entries(cart);
+      if (entries.length === 0) {
+        cartContainer.textContent = "Cart is empty.";
+        totalAmount.textContent = "";
+        return;
+      }
+
+      let total = 0;
+      entries.forEach(([item, data]) => {
+        total += data.qty * data.price;
+        const cartItem = document.createElement("div");
+        cartItem.innerHTML = `
+          ${item} (x${data.qty}) - ₹${data.qty * data.price}
+          <span>
+            <button onclick="addToCart('${item}', ${data.price})">+</button>
+            <button onclick="removeFromCart('${item}')">-</button>
+          </span>
+        `;
+        cartContainer.appendChild(cartItem);
+      });
+      totalAmount.textContent = `Total: ₹${total}`;
+    };
+
+    const addToCart = (item, price) => {
+      if (!cart[item]) cart[item] = { qty: 0, price };
+      cart[item].qty++;
+      updateCart();
+    };
+
+    const removeFromCart = item => {
+      if (cart[item]) {
+        cart[item].qty--;
+        if (cart[item].qty <= 0) delete cart[item];
+        updateCart();
+      }
+    };
+
+    const menuItems = menuItemsMap[restaurantName] || [];
+    if (menuItems.length === 0) {
+      menuList.innerHTML = "<p>No menu available for this restaurant.</p>";
+    } else {
+      menuItems.forEach(({ name, price }) => {
+        const menuItem = document.createElement("div");
+        menuItem.className = "menu-item";
+        menuItem.innerHTML = `
+          <span>${name} - ₹${price}</span>
+          <button onclick="addToCart('${name}', ${price})">Add</button>
+        `;
+        menuList.appendChild(menuItem);
+      });
+    }
+
+    function saveCartToDatabase() {
+    return fetch("http://localhost/food_app/save_cart.php", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        restaurant: restaurantName,
+        cart: cart
+      })
+    })
+    .then(res => res.text())
+    .then(text => {
+      try {
+        const data = JSON.parse(text);
+        console.log("Save cart response:", data);
+        if (data.status === "success") {
+          return true;
+        } else {
+          alert("Error: " + data.message);
+          return false;
+        }
+      } catch (e) {
+        console.error("Invalid JSON from server:", text);
+        alert("Server error: Invalid response");
+        return false;
+      }
+    })
+    .catch(err => {
+      console.error("Network error:", err);
+      alert("Server error. Please try again later.");
+      return false;
+    });
+  }
+
+  const buyNow = async () => {
+  if (Object.keys(cart).length === 0) {
+    alert("Please add items before buying.");
+    return;
+  }
+
+  const saved = await saveCartToDatabase();
+  if (!saved) return;
+
+  const total = Object.values(cart).reduce((sum, item) => sum + item.qty * item.price, 0);
+  const itemList = Object.entries(cart).map(([item, obj]) => `${item} (x${obj.qty})`).join(", ");
+
+  const options = {
+    key: "rzp_test_Sgsw4VMJL1GuYI", // replace with live key in production
+    amount: total * 100,
+    currency: "INR",
+    name: "Food Order",
+    description: "Payment for: " + itemList,
+    handler: async function (response) {
+      alert("Payment successful! ID: " + response.razorpay_payment_id);
+      await saveCartToDatabase(); // save again after payment
+      window.location.href = "index.html"; // ✅ redirect after success
+    },
+    prefill: {
+      name: "Your Name",
+      email: "your_email@example.com",
+      contact: "9999999999"
+    },
+    theme: { color: "#28a745" }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+};
+</script>
+</body>
+</html>

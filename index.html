@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Listings</title>
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -30,11 +31,6 @@
         nav ul li a {
             text-decoration: none;
             color: white;
-        }
-        nav ul li .logout-btn {
-            background: #222;
-            padding: 8px 15px;
-            border-radius: 5px;
         }
         header {
             text-align: center;
@@ -64,6 +60,7 @@
             border-radius: 10px;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
         }
         .restaurant-card img {
             width: 100%;
@@ -71,93 +68,69 @@
             border-radius: 10px;
             object-fit: cover;
         }
-        .restaurant-card button {
-            background: #ff4d4d;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
-
-    <!-- Navigation Bar -->
     <nav>
         <div style="font-size: 24px; font-weight: bold;">FoodDelivery</div>
         <ul>
             <li><a href="#">Home</a></li>
-            <li><a href="#">Special Offers</a></li>
-            <li><a href="#">Restaurants</a></li>
-            <li><a href="#">Track Order</a></li>
             <li><a href="loginshow.html" class="logout-btn">Logout</a></li>
         </ul>
     </nav>
-
-    <!-- Hero Section -->
+    
     <header>
         <h1>Find the Best Restaurants Near You</h1>
-        <p>Order your favorite meals from top-rated restaurants with fast delivery.</p>
         <input type="text" id="searchBox" onkeyup="searchRestaurants()" placeholder="Search for a restaurant...">
     </header>
-
-    <!-- Restaurant Listings -->
+    
     <div id="restaurantList"></div>
-
+    
     <script>
         const restaurants = [
-            { name: "McDonald's", img: "pic/mcd.webp" },
             { name: "Pizza Hut", img: "pic/pizz.avif" },
             { name: "Burger King", img: "pic/bur.avif" },
             { name: "KFC", img: "pic/kfc.avif" },
             { name: "Subway", img: "pic/sub.jpg" },
             { name: "Taco Bell", img: "pic/taco.jpg" },
             { name: "Starbucks", img: "pic/star.jpg" },
-            { name: "Domino's Pizza", img: "pic/dom.jpg" },
-            { name: "Dunkin' Donuts", img: "pic/dun.jpg" },
-            { name: "Panda Express", img: "pic/pan.jpg" },
+            { name: "Dominos Pizza", img: "pic/dom.jpg" },
             { name: "Chick-fil-A", img: "pic/chi.jpg" },
-            { name: "Shake Shack", img: "pic/sha.jpg" },
-            { name: "Five Guys", img: "pic/fiv.jpg" },
-            { name: "IHOP", img: "pic/ih.jpg" },
-            { name: "Chipotle", img: "pic/c.jpg" },
             { name: "The Cheesecake Factory", img: "pic/l.jpg" },
-            { name: "Popeyes", img: "pic/pop.jpg" },
-            { name: "Ben & Jerry's", img: "pic/ben.jpg" },
-            { name: "Krispy Kreme", img: "pic/kri.jpg" },
-            { name: "Panera Bread", img: "pic/kyu.jpg" },
-            { name: "Wendy's", img: "pic/wen.jpg" },
-            { name: "Dairy Queen", img: "pic/dai.jpg" },
-            { name: "Outback Steakhouse", img: "pic/ste.jpg" },
-            { name: "Olive Garden", img: "pic/oli.jpg" },
-            { name: "Buffalo Wild Wings", img: "pic/wild.jpg" },
-            { name: "Texas Roadhouse", img:"pic/texas.jpg" },
-            { name: "In-N-Out Burger", img: "pic/ger.jpg" },
-            { name: "Arby's", img: "pic/arby.jpg" },
-            { name: "Hard Rock Cafe", img: "pic/hard.jpg" },
-            { name: "P.F. Chang's", img: "pic/momo.jpg" }
+            { name: "Popeyes", img: "pic/pop.jpg" }
         ];
 
         const restaurantList = document.getElementById("restaurantList");
 
-        restaurants.forEach(rest => {
-            let card = `<div class="restaurant-card" data-name="${rest.name}">
-                <img src="${rest.img}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x250'" alt="${rest.name}">
-                <h3>${rest.name}</h3>
-                <p><i class="fas fa-motorcycle"></i> Delivery in 15-30 mins</p>
-                <button>Order Now</button>
-            </div>`;
-            restaurantList.innerHTML += card;
-        });
-
-        function searchRestaurants() {
-            let input = document.getElementById('searchBox').value.toLowerCase();
-            document.querySelectorAll('.restaurant-card').forEach(card => {
-                card.style.display = card.dataset.name.toLowerCase().includes(input) ? "block" : "none";
+        function displayRestaurants(list) {
+            restaurantList.innerHTML = '';
+            if (list.length === 0) {
+                restaurantList.innerHTML = '<p>No restaurants found.</p>';
+                return;
+            }
+            list.forEach(rest => {
+                const card = `<div class="restaurant-card" onclick="openRestaurant('${rest.name}', '${rest.img}')">
+                    <img src="${rest.img}" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x250'" alt="${rest.name}">
+                    <h3>${rest.name}</h3>
+                </div>`;
+                restaurantList.innerHTML += card;
             });
         }
-    </script>
 
+        function searchRestaurants() {
+            const input = document.getElementById("searchBox").value.toLowerCase();
+            const filtered = restaurants.filter(rest =>
+                rest.name.toLowerCase().includes(input)
+            );
+            displayRestaurants(filtered);
+        }
+
+        function openRestaurant(name, img) {
+            window.location.href = `restaurant.html?name=${encodeURIComponent(name)}&img=${encodeURIComponent(img)}`;
+        }
+
+        // Show all restaurants on page load
+        window.onload = () => displayRestaurants(restaurants);
+    </script>
 </body>
 </html>
