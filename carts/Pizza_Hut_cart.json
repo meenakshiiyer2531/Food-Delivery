@@ -1,0 +1,10 @@
+{
+    "Margherita": {
+        "qty": 1,
+        "price": 200
+    },
+    "Pepperoni Pizza": {
+        "qty": 1,
+        "price": 280
+    }
+}

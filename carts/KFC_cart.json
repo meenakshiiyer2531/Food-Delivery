@@ -1,0 +1,10 @@
+{
+    "Zinger Burger": {
+        "qty": 1,
+        "price": 120
+    },
+    "Popcorn Chicken": {
+        "qty": 2,
+        "price": 150
+    }
+}
